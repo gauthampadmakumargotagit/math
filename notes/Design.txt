@@ -1,0 +1,12 @@
+Prompt engineering design:
+==========================
+I am working on Git pages static webapps. Give me a index.html file which titles as "Math", where on the left pane I have links like "Quadratic", "Projectile", etc. On clicking the link, the Right side pane should show relevant pages like Quadratic.html , or Projectile.html. The page and code which are individually developed on individual pages like Quadratic.html must be usable for user. Make a framework like piece of art.
+
+/
+├─ index.html
+├─ styles.css
+├─ pages/
+│   ├─ Quadratic.html
+│   ├─ Projectile.html
+│   └─ Linear.html
+
