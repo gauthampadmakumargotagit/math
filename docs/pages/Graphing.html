@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Equation Plotter</title>
+<style>
+body{
+   font-family:Arial;
+   margin:20px;
+}
+textarea{
+   width:100%;
+   height:180px;
+   font-family:Consolas;
+   font-size:14px;
+}
+canvas{
+   border:1px solid black;
+   margin-top:10px;
+   width: 100%;
+   aspect-ratio: 1 / 1;
+   display: block;
+}
+button{
+   margin-top:10px;
+   padding:8px 20px;
+}
+</style>
+</head>
+<body>
+<h1>Equation Plotter</h1>
+<h3>Definition of F(x,y)</h3>
+<textarea id="code">
+// User constants
+var x1 = 2;
+var y1 = 3;
+var R  = 5;
+
+// Return F(x,y)
+return (x-x1)*(x-x1) + (y-y1)*(y-y1) - R*R; //Example of circle
+</textarea>
+<br>
+<button onclick="drawGraph()">Draw</button>
+<br>
+<canvas id="graph" width="800" height="800"></canvas>
+<script>
+const canvas = document.getElementById("graph");
+const ctx = canvas.getContext("2d");
+const WIDTH = canvas.width;
+const HEIGHT = canvas.height;
+const SCALE = 40;
+const CENTERX = WIDTH/2;
+const CENTERY = HEIGHT/2;
+function drawGrid()
+{
+   ctx.clearRect(0,0,WIDTH,HEIGHT);
+   ctx.strokeStyle="#dddddd";
+   for(let x=0;x<=WIDTH;x+=SCALE)
+   {
+       ctx.beginPath();
+       ctx.moveTo(x,0);
+       ctx.lineTo(x,HEIGHT);
+       ctx.stroke();
+   }
+   for(let y=0;y<=HEIGHT;y+=SCALE)
+   {
+       ctx.beginPath();
+       ctx.moveTo(0,y);
+       ctx.lineTo(WIDTH,y);
+       ctx.stroke();
+   }
+   ctx.strokeStyle="black";
+   ctx.beginPath();
+   ctx.moveTo(CENTERX,0);
+   ctx.lineTo(CENTERX,HEIGHT);
+   ctx.stroke();
+   ctx.beginPath();
+   ctx.moveTo(0,CENTERY);
+   ctx.lineTo(WIDTH,CENTERY);
+   ctx.stroke();
+}
+function drawGraph()
+{
+   drawGrid();
+   let F;
+   try
+   {
+       F=new Function("x","y",document.getElementById("code").value);
+   }
+   catch(err)
+   {
+       alert(err);
+       return;
+   }
+   const epsilon=0.15;
+   ctx.fillStyle="blue";
+   try
+   {
+       for(let py=0;py<HEIGHT;py++)
+       {
+           for(let px=0;px<WIDTH;px++)
+           {
+               const x=(px-CENTERX)/SCALE;
+               const y=(CENTERY-py)/SCALE;
+               const value=F(x,y);
+               if(Math.abs(value)<epsilon)
+               {
+                   ctx.fillRect(px,py,1,1);
+               }
+           }
+       }
+   }
+   catch(err)
+   {
+       alert(err);
+   }
+}
+drawGraph();
+</script>
+</body>
+</html>
