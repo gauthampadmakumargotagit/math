@@ -1,121 +1,190 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta
+       name="viewport"
+       content="width=device-width, initial-scale=1.0">
 <title>Equation Plotter</title>
-<style>
-body{
-   font-family:Arial;
-   margin:20px;
-}
-textarea{
-   width:100%;
-   height:180px;
-   font-family:Consolas;
-   font-size:14px;
-}
-canvas{
-   border:1px solid black;
-   margin-top:10px;
-   width: 100%;
-   aspect-ratio: 1 / 1;
-   display: block;
-}
-button{
-   margin-top:10px;
-   padding:8px 20px;
-}
-</style>
+<link
+       rel="stylesheet"
+       href="Graphing\Graphing.css">
 </head>
 <body>
+<div id="app">
+<!-- ==========================================
+        Title
+   =========================================== -->
+<header>
 <h1>Equation Plotter</h1>
-<h3>Definition of F(x,y)</h3>
-<textarea id="code">
+</header>
+
+<!-- ==========================================
+        Equation Editor
+   =========================================== -->
+<section id="editorPanel">
+<label for="equationInput">
+Definition of F(x,y)
+</label>
+<textarea id="equationInput" spellcheck="false">
+// Example of a circle
 // User constants
 var x1 = 2;
 var y1 = 3;
 var R  = 5;
 
 // Return F(x,y)
-return (x-x1)*(x-x1) + (y-y1)*(y-y1) - R*R; //Example of circle
+return (x-x1)*(x-x1) + (y-y1)*(y-y1) - R*R;
+
+//Other examples
+//return circle(x, y);
+//return ellipse(x, y);
+//return ellipseRotated(x, y);
+//return hyperbola(x, y);
+//return parabola(x, y);
+//return heart(x, y);
+//return lemniscate(x, y);
+//return cassini(x, y);
+//return circlesDuo(x, y);
+
+function circle(x, y)
+{
+   const r = 5;
+   const cx = 2;
+   const cy = 6;
+   return (x - cx) ** 2 + (y - cy) ** 2 - r ** 2;
+}
+function ellipse(x, y)
+{
+   const a = 6;
+   const b = 3;
+   return (x * x) / (a * a) + (y * y) / (b * b) - 1;
+}
+function ellipseRotated(x, y)
+{
+   const a = 6;
+   const b = 3;
+   const angle = Math.PI / 6;
+   const xr = x * Math.cos(angle) + y * Math.sin(angle);
+   const yr = -x * Math.sin(angle) + y * Math.cos(angle);
+   return (xr * xr) / (a * a) + (yr * yr) / (b * b) - 1;
+}
+function hyperbola(x, y)
+{
+   const a = 4;
+   const b = 2;
+   return (x * x) / (a * a) - (y * y) / (b * b) - 1;
+}
+function parabola(x, y)
+{
+   const a = 1;
+   return y - a * x * x;
+}
+function heart(x, y)
+{
+   return Math.pow(x * x + y * y - 1, 3)
+       - x * x * y * y * y;
+}
+function lemniscate(x, y)
+{
+   return (x * x + y * y) ** 2 - 2 * (x * x - y * y);
+}
+function cassini(x, y)
+{
+   const a = 4;
+   return (x * x + y * y) ** 2
+       - 2 * a * a * (x * x - y * y)
+       - a ** 4;
+}
+function circlesDuo(x, y)
+{
+   const r = 3;
+   const c1x = -3;
+   const c2x = 3;
+   const c1 = (x - c1x) ** 2 + y * y - r * r;
+   const c2 = (x - c2x) ** 2 + y * y - r * r;
+   return c1 * c2;
+}
 </textarea>
-<br>
-<button onclick="drawGraph()">Draw</button>
-<br>
-<canvas id="graph" width="800" height="800"></canvas>
-<script>
-const canvas = document.getElementById("graph");
-const ctx = canvas.getContext("2d");
-const WIDTH = canvas.width;
-const HEIGHT = canvas.height;
-const SCALE = 40;
-const CENTERX = WIDTH/2;
-const CENTERY = HEIGHT/2;
-function drawGrid()
-{
-   ctx.clearRect(0,0,WIDTH,HEIGHT);
-   ctx.strokeStyle="#dddddd";
-   for(let x=0;x<=WIDTH;x+=SCALE)
-   {
-       ctx.beginPath();
-       ctx.moveTo(x,0);
-       ctx.lineTo(x,HEIGHT);
-       ctx.stroke();
-   }
-   for(let y=0;y<=HEIGHT;y+=SCALE)
-   {
-       ctx.beginPath();
-       ctx.moveTo(0,y);
-       ctx.lineTo(WIDTH,y);
-       ctx.stroke();
-   }
-   ctx.strokeStyle="black";
-   ctx.beginPath();
-   ctx.moveTo(CENTERX,0);
-   ctx.lineTo(CENTERX,HEIGHT);
-   ctx.stroke();
-   ctx.beginPath();
-   ctx.moveTo(0,CENTERY);
-   ctx.lineTo(WIDTH,CENTERY);
-   ctx.stroke();
-}
-function drawGraph()
-{
-   drawGrid();
-   let F;
-   try
-   {
-       F=new Function("x","y",document.getElementById("code").value);
-   }
-   catch(err)
-   {
-       alert(err);
-       return;
-   }
-   const epsilon=0.15;
-   ctx.fillStyle="blue";
-   try
-   {
-       for(let py=0;py<HEIGHT;py++)
-       {
-           for(let px=0;px<WIDTH;px++)
-           {
-               const x=(px-CENTERX)/SCALE;
-               const y=(CENTERY-py)/SCALE;
-               const value=F(x,y);
-               if(Math.abs(value)<epsilon)
-               {
-                   ctx.fillRect(px,py,1,1);
-               }
-           }
-       }
-   }
-   catch(err)
-   {
-       alert(err);
-   }
-}
-drawGraph();
-</script>
+</section>
+
+<!-- ==========================================
+        Toolbar
+   =========================================== -->
+<section id="toolbar">
+<button
+           id="drawButton"
+           type="button">
+           Draw
+</button>
+
+<div id="toolButtons">
+<button
+               id="defaultToolButton"
+               class="toolButton active"
+               type="button"
+               title="Default">
+               ⌖
+</button>
+
+<button
+               id="grabToolButton"
+               class="toolButton"
+               type="button"
+               title="Grab">
+               ✋
+</button>
+
+<button
+               id="zoomInToolButton"
+               class="toolButton"
+               type="button"
+               title="Zoom In">
+               ＋
+</button>
+
+<button
+               id="zoomOutToolButton"
+               class="toolButton"
+               type="button"
+               title="Zoom Out">
+               －
+</button>
+</div>
+</section>
+
+<!-- ==========================================
+        Canvas
+   =========================================== -->
+<section id="canvasPanel">
+<canvas
+           id="graphCanvas">
+</canvas>
+</section>
+
+<!-- ==========================================
+        Status Bar
+   =========================================== -->
+<footer id="statusBar">
+<span>
+           X :
+<span id="statusX">0.000</span>
+</span>
+<span>
+           Y :
+<span id="statusY">0.000</span>
+</span>
+<span>
+           Scale :
+<span id="statusScale">40</span>
+</span>
+<span>
+           Tool :
+<span id="statusTool">Default</span>
+</span>
+</footer>
+</div>
+
+<script src="Graphing\Graphing.js"></script>
 </body>
 </html>
