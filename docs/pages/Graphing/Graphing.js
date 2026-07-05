@@ -516,9 +516,12 @@ function updatePointerFromEvent(event)
 
 function canvasPointerMove(event)
 {
+   if (!Pointer.down)
+   {
+	   return;
+   }
    updatePointerFromEvent(event);
-   if (Pointer.down &&
-       Graph.tool === "grab")
+   if (Pointer.down && Graph.tool === "grab")
    {
        const dx =
            Pointer.x - Pointer.startX;
@@ -604,6 +607,10 @@ UI.canvas.addEventListener(
 UI.canvas.addEventListener(
    "pointerdown",
    canvasPointerDown
+);
+UI.canvas.addEventListener(
+   "pointercancel",
+   canvasPointerUp
 );
 window.addEventListener(
    "pointerup",
