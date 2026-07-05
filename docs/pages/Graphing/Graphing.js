@@ -501,15 +501,22 @@ function compileEquation()
 /*==================================================
    Pointer Events
 ==================================================*/
+function updatePointerFromEvent(event)
+{
+   const rect = UI.canvas.getBoundingClientRect();
+   Pointer.x = event.clientX - rect.left;
+   Pointer.y = event.clientY - rect.top;
+   Pointer.mathX =
+       (Pointer.x - Graph.centerX) / Graph.scale
+       + Graph.offsetX;
+   Pointer.mathY =
+       (Graph.centerY - Pointer.y) / Graph.scale
+       + Graph.offsetY;
+}
+
 function canvasPointerMove(event)
 {
-   const rect =
-       UI.canvas.getBoundingClientRect();
-   Pointer.x =
-       event.clientX - rect.left;
-   Pointer.y =
-       event.clientY - rect.top;
-   updatePointerMathCoordinates();
+   updatePointerFromEvent(event);
    if (Pointer.down &&
        Graph.tool === "grab")
    {
@@ -519,12 +526,10 @@ function canvasPointerMove(event)
            Pointer.y - Pointer.startY;
        Graph.offsetX =
            Pointer.startOffsetX
-           -
-           dx / Graph.scale;
+           - dx / Graph.scale;
        Graph.offsetY =
            Pointer.startOffsetY
-           +
-           dy / Graph.scale;
+           + dy / Graph.scale;
        drawGraph();
    }
    updateStatus();
@@ -532,6 +537,7 @@ function canvasPointerMove(event)
 
 function canvasPointerDown(event)
 {
+   updatePointerFromEvent(event);
    Pointer.down = true;
    Pointer.pointerId = event.pointerId;
    UI.canvas.setPointerCapture(event.pointerId);
@@ -544,10 +550,9 @@ function canvasPointerDown(event)
    // -------------------------
    if (Graph.tool === "zoomin")
    {
-       const clicked = pixelToMath(Pointer.x, Pointer.y);
        Graph.scale += 10;
-       Graph.offsetX = clicked.x;
-       Graph.offsetY = clicked.y;
+       Graph.offsetX = Pointer.mathX;
+       Graph.offsetY = Pointer.mathY;
        drawGraph();
    }
    // -------------------------
@@ -555,23 +560,25 @@ function canvasPointerDown(event)
    // -------------------------
    if (Graph.tool === "zoomout")
    {
-       const clicked = pixelToMath(Pointer.x, Pointer.y);
-       Graph.scale = Math.max(1, Graph.scale - 10);
-       Graph.offsetX = clicked.x;
-       Graph.offsetY = clicked.y;
+       Graph.scale =
+           Math.max(1, Graph.scale - 10);
+       Graph.offsetX = Pointer.mathX;
+       Graph.offsetY = Pointer.mathY;
        drawGraph();
    }
    // -------------------------
-   // GRAB TOOL VISUAL FEEDBACK
+   // GRAB TOOL
    // -------------------------
    if (Graph.tool === "grab")
    {
        UI.canvas.style.cursor = "grabbing";
    }
+   updateStatus();
 }
 
 function canvasPointerUp(event)
 {
+   updatePointerFromEvent(event);
    if (Pointer.pointerId !== null)
    {
        UI.canvas.releasePointerCapture(
@@ -584,6 +591,7 @@ function canvasPointerUp(event)
    {
        UI.canvas.style.cursor = "grab";
    }
+   updateStatus();
 }
 
 /*==================================================
