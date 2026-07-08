@@ -101,9 +101,9 @@ function circlesDuo(x, y)
    const r = 3;
    const c1x = -3;
    const c2x = 3;
-   const c1 = (x - c1x) ** 2 + y * y - r * r;
-   const c2 = (x - c2x) ** 2 + y * y - r * r;
-   return c1 * c2;
+   const c1 = ((x - c1x) ** 2 + y * y - r * r < 0.15 ? 0:1);
+   const c2 = ((x - c2x) ** 2 + y * y - r * r < 0.15 ? 0:1);
+   return (c1 * c2);
 }
 </textarea>
 </section>
