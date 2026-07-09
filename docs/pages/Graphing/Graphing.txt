@@ -1,0 +1,152 @@
+Graphing Program Documentation
+==============================
+
+1) Purpose / What This HTML Page Serves
+----------------------------------------
+This page is an interactive implicit-equation plotter for functions of the form F(x, y) = 0.
+
+Its main purpose is to let a user:
+- Write JavaScript code that defines F(x, y) inside a text editor.
+- Compile and draw the resulting curve on a 2D Cartesian canvas.
+- Explore the graph visually using pan and zoom tools.
+
+In short, it serves as a lightweight math lab for experimenting with algebraic and custom geometric curves directly in the browser.
+
+
+2) Capabilities
+---------------
+Core capabilities implemented in the current files:
+
+- Equation editor
+  - Multi-line textarea accepts JavaScript code body for evaluator function.
+  - Supports constants, helper functions, and a return expression.
+  - Includes built-in sample shapes in the default text (circle, ellipse, rotated ellipse, hyperbola, parabola, heart, lemniscate, cassini, two circles).
+
+- Runtime equation compilation
+  - Pressing Draw compiles user text via new Function("x", "y", source).
+  - Syntax errors show as "Compilation Error" alerts.
+  - Runtime errors during plotting show as "Runtime Error" alerts.
+
+- Implicit curve rendering
+  - The renderer evaluates each pixel, converts it to (x, y), computes F(x, y), and draws points where |F(x, y)| < epsilon.
+  - Uses epsilon threshold (0.15) to visualize the zero-level set.
+
+- Coordinate system and visuals
+  - Draws background grid lines.
+  - Draws x-axis and y-axis through the mathematical origin.
+  - Keeps mathematical orientation (+y upward) via coordinate conversion helpers.
+
+- Interactive tools
+  - Default tool.
+  - Grab tool: drag to pan the view by changing offsets.
+  - Zoom In tool: click to increase scale and center near clicked math coordinate.
+  - Zoom Out tool: click to decrease scale (minimum 1) and center near clicked coordinate.
+
+- Status feedback
+  - Real-time status bar displays pointer X, Y (math coordinates), current scale, and active tool.
+
+- Responsive and pointer-friendly behavior
+  - Canvas resizes with window while preserving sharpness using devicePixelRatio.
+  - Uses Pointer Events and touch-action: none for mouse/touch/pen compatibility.
+  - Mobile toolbar layout adapts under 600px.
+
+
+3) Design of the Program
+------------------------
+The program follows a simple single-page architecture with clear separation of concerns.
+
+A) Structure (HTML)
+- Header with title.
+- Editor panel with label + textarea for equation source.
+- Toolbar with Draw and tool selection buttons.
+- Canvas panel for graph drawing.
+- Footer status bar with live metrics.
+
+B) Styling (CSS)
+- CSS variables define theme colors.
+- Layout is panel-based with max-width container.
+- Tool button active state is highlighted.
+- Canvas uses aspect-ratio: 1 / 1 and border for clear plotting area.
+- Media query rearranges toolbar for smaller screens.
+
+C) Behavior and state (JavaScript)
+- UI object:
+  - Stores DOM references once and freezes the reference map.
+
+- Graph state object:
+  - View: scale, offsetX, offsetY.
+  - Rendering: epsilon, evaluator.
+  - Canvas metrics: width, height, center, DPR.
+  - Tool mode.
+
+- Pointer state object:
+  - Pixel coordinates, math coordinates, drag state, pointer capture data.
+
+- Rendering pipeline:
+  1. clearCanvas()
+  2. drawGrid()
+  3. drawAxes()
+  4. drawEquation()
+
+- Coordinate conversion helpers:
+  - pixelToMath(px, py)
+  - mathToPixel(x, y)
+
+- Event-driven interaction:
+  - Draw button compiles + redraws.
+  - Pointer move/down/up handlers manage panning and click-zoom logic.
+  - Resize handler recalculates canvas metrics and redraws.
+
+- Startup sequence:
+  - initialise() sets canvas size, default tool, initial status, compiles initial equation, and draws.
+
+D) Current implementation characteristics
+- The plotting algorithm is brute-force over all pixels each draw.
+- Simplicity makes behavior predictable and easy to modify.
+- Performance depends on canvas dimensions, equation complexity, and DPR.
+
+
+4) Advanced Possibilities
+-------------------------
+Potential improvements and extensions:
+
+- Faster rendering engines
+  - Use marching squares to trace contours of F(x, y)=0 efficiently.
+  - Add adaptive sampling/refinement near sign changes.
+  - Move computation to Web Workers to keep UI responsive.
+  - Use WebGL fragment shader rendering for large canvases/high FPS.
+
+- Better mathematical controls
+  - User controls for epsilon, grid spacing, axis labels, and line thickness.
+  - Domain limits and viewport presets.
+  - Optional plotting of multiple equations simultaneously.
+  - Color map for signed values of F(x, y) (heatmap + zero contour).
+
+- Safer expression evaluation
+  - Replace new Function with a math-expression parser/sandbox.
+  - Restrict language features for security and predictability.
+
+- Improved zoom/pan UX
+  - Mouse wheel / pinch zoom centered at cursor.
+  - Smooth animated zoom transitions.
+  - Home/reset view and undo/redo camera movement.
+
+- Rich math features
+  - Parameter sliders (a, b, c, etc.) with live replot.
+  - Time parameter t for animated implicit curves.
+  - Numeric root/contour diagnostics near cursor.
+
+- Export and sharing
+  - Save/load equation presets.
+  - Export PNG/SVG of graph.
+  - Shareable URL encoding equation + viewport state.
+
+- Accessibility and quality
+  - Keyboard shortcuts for tools and draw.
+  - Better error panel (line/column hints).
+  - Unit tests for coordinate transforms and tool behavior.
+
+
+Summary
+-------
+This program is a browser-based implicit equation explorer centered on F(x, y)=0 plotting. It already has a solid foundation (editor, compilation, renderer, pan/zoom, responsive UI), and it can be evolved into a high-performance mathematical visualization tool with contour algorithms, safer parsing, and richer interaction features.
